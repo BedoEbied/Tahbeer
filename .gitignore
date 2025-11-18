@@ -41,6 +41,14 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Lockfiles (prefer Yarn)
+package-lock.json
+**/package-lock.json
+pnpm-lock.yaml
+**/pnpm-lock.yaml
+bun.lockb
+**/bun.lockb
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -77,6 +85,9 @@ web_modules/
 # Next.js build output
 .next
 out
+
+# Ignore stray nested frontend under backend (if present)
+backend/frontend/
 
 # Nuxt.js build / generate output
 .nuxt
