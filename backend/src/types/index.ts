@@ -117,8 +117,11 @@ export interface ChangePasswordDTO {
 export type UserWithoutPassword = Omit<IUser, 'password'>;
 
 export interface CourseWithInstructor extends ICourse {
+ 
+  instructor :{
   instructor_name: string;
   instructor_email: string;
+  }
 }
 
 export interface EnrollmentWithDetails extends IEnrollment {

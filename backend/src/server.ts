@@ -7,7 +7,7 @@ import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import studentRoutes from './routes/student';
 import instructorRoutes from './routes/instructor';
-
+import courseRoutes from './routes/course';
 dotenv.config();
 
 const app: Application = express();
@@ -26,7 +26,8 @@ app.get('/', (_req: Request, res: Response) => {
       auth: '/api/auth',
       admin: '/api/admin',
       student: '/api/student',
-      instructor: '/api/instructor'
+      instructor: '/api/instructor',
+      course: 'api/course'
     }
   });
 });
@@ -36,6 +37,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/instructor', instructorRoutes);
+app.use('/api/course', courseRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

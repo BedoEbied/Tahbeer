@@ -42,7 +42,19 @@ export class Course {
         ORDER BY c.created_at DESC
       `);
 
-      return rows as CourseWithInstructor[];
+    return rows.map(row => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      price: row.price,
+      image_url: row.image_url,
+      status: row.status,
+      created_at: row.created_at,
+      instructor: {
+        name: row.instructor_name,
+        email: row.instructor_email
+      }
+    })) as unknown as CourseWithInstructor[];
     } catch (error) {
       console.error('Error fetching all courses:', error);
       throw error;
