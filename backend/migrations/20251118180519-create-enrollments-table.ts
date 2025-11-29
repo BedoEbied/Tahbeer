@@ -1,31 +1,26 @@
-let dbm: any;
-let type: any;
-let seed: any;
+import { Knex } from 'knex';
 
-/**
-  * We receive the dbmigrate dependency from dbmigrate initially.
-  * This enables us to not have to rely on NODE_PATH.
-  */
-exports.setup = function(options: any, seedLink: any): void {
-  dbm = options.dbmigrate;
-  type = dbm.dataType;
-  seed = seedLink;
-};
-
-exports.up = function(db: any): Promise<any> {
-  return db.createTable('enrollments', {
-    id: { type: 'int', primaryKey: true, autoIncrement: true },
-    user_id: { type: 'int', notNull: true, foreignKey: { name: 'enrollments_user_fk', table: 'users', mapping: 'id', rules: { onDelete: 'CASCADE' } } },
-    course_id: { type: 'int', notNull: true, foreignKey: { name: 'enrollments_course_fk', table: 'courses', mapping: 'id', rules: { onDelete: 'CASCADE' } } },
-    enrolled_at: { type: 'timestamp', notNull: true, defaultValue: String('CURRENT_TIMESTAMP') }
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.createTable('enrollments', (table) => {
+    table.increments('id').primary();
+    table
+      .integer('user_id')
+      .unsigned()
+      .notNullable()
+      .references('id')
+      .inTable('users')
+      .onDelete('CASCADE');
+    table
+      .integer('course_id')
+      .unsigned()
+      .notNullable()
+      .references('id')
+      .inTable('courses')
+      .onDelete('CASCADE');
+    table.timestamp('enrolled_at').notNullable().defaultTo(knex.fn.now());
   });
-};
+}
 
-exports.down = function(db: any): Promise<any> {
-  return db.dropTable('enrollments');
-};
-
-exports._meta = {
-  "version": 1
-};
-
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTableIfExists('enrollments');
+}

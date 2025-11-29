@@ -1,33 +1,16 @@
-let dbm: any;
-let type: any;
-let seed: any;
+import { Knex } from 'knex';
 
-/**
-  * We receive the dbmigrate dependency from dbmigrate initially.
-  * This enables us to not have to rely on NODE_PATH.
-  */
-exports.setup = function(options: any, seedLink: any): void {
-  dbm = options.dbmigrate;
-  type = dbm.dataType;
-  seed = seedLink;
-};
-
-exports.up = function(db: any): Promise<any> {
-  return db.createTable('users', {
-    id: { type: 'int', primaryKey: true, autoIncrement: true },
-    email: { type: 'string', length: 255, notNull: true, unique: true },
-    password: { type: 'string', length: 255, notNull: true },
-    name: { type: 'string', length: 255, notNull: true },
-    role: { type: 'string', length: 50, notNull: true, defaultValue: 'student' },
-    created_at: { type: 'timestamp', notNull: true, defaultValue: String('CURRENT_TIMESTAMP') }
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.createTable('users', (table) => {
+    table.increments('id').primary();
+    table.string('email', 255).notNullable().unique();
+    table.string('password', 255).notNullable();
+    table.string('name', 255).notNullable();
+    table.string('role', 50).notNullable().defaultTo('student');
+    table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
   });
-};
+}
 
-exports.down = function(db: any): Promise<any> {
-  return db.dropTable('users');
-};
-
-exports._meta = {
-  "version": 1
-};
-
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTableIfExists('users');
+}

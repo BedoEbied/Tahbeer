@@ -97,7 +97,7 @@ Tahbeer/
    EXIT;
    ```
 
-5. **Run migrations**
+5. **Run migrations (Knex)**
    ```bash
    yarn migrate:up
    ```
@@ -197,7 +197,7 @@ Tahbeer/
 - `yarn start` - Run production server
 - `yarn migrate:up` - Run database migrations
 - `yarn migrate:down` - Rollback migrations
-- `yarn migrate:create <name>` - Create new migration
+- `yarn migrate:create <name>` - Create new Knex migration (uses `backend/migrations/template.ts` stub)
 
 ### Frontend
 - `yarn dev` - Start Next.js development server
