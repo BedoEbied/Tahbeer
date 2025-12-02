@@ -1,11 +1,13 @@
 import { Router, Response } from 'express';
-import { body, param, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import { authenticate } from '../middleware/auth';
 import { roleCheck } from '../middleware/roleCheck';
-import { AuthRequest, UserRole, CreateCourseDTO, UpdateCourseDTO } from '../types';
+import { AuthRequest, UserRole, UpdateCourseDTO } from '../types';
 import Course from '../models/Course';
 import Enrollment from '../models/Enrollment';
-
+import CourseController from '../controllers/courseController';
+import { createCourseValidators, updateCourseValidators, deleteCourseValidators } from '../validators/courseValidators';
+import { instructorCourseEnrollmentsValidators } from '../validators/instructorValidators';
 const router = Router();
 
 // All instructor routes require authentication and instructor/admin role
@@ -49,49 +51,8 @@ router.get('/courses', async (req: AuthRequest, res: Response): Promise<void> =>
  */
 router.post(
   '/courses',
-  [
-    body('title').notEmpty().withMessage('Course title is required'),
-    body('description').optional().isString(),
-    body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-    body('image_url').optional().isURL().withMessage('Invalid image URL'),
-    body('status').optional().isIn(['draft', 'published']).withMessage('Invalid status')
-  ],
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: 'Validation failed',
-          errors: errors.array()
-        });
-        return;
-      }
-
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Not authenticated'
-        });
-        return;
-      }
-
-      const courseData: CreateCourseDTO = req.body;
-      const course = await Course.create(courseData, req.user.userId);
-
-      res.status(201).json({
-        success: true,
-        message: 'Course created successfully',
-        data: { course }
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Error creating course',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  }
+  createCourseValidators,
+  CourseController.createCourse
 );
 
 /**
@@ -101,17 +62,7 @@ router.post(
  */
 router.put(
   '/courses/:id',
-  [
-    param('id').isInt().withMessage('Invalid course ID'),
-    body('title').optional().notEmpty().withMessage('Course title cannot be empty'),
-    body('description').optional().isString(),
-    body('price').optional().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-    body('image_url').optional().isURL().withMessage('Invalid image URL'),
-    body('status')
-      .optional()
-      .isIn(['draft', 'published', 'archived'])
-      .withMessage('Invalid status')
-  ],
+  updateCourseValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -185,7 +136,7 @@ router.put(
  */
 router.delete(
   '/courses/:id',
-  [param('id').isInt().withMessage('Invalid course ID')],
+  deleteCourseValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -250,7 +201,7 @@ router.delete(
  */
 router.get(
   '/courses/:id/enrollments',
-  [param('id').isInt().withMessage('Invalid course ID')],
+  instructorCourseEnrollmentsValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);

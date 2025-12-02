@@ -1,10 +1,15 @@
 import { Router, Response } from 'express';
-import { param, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import { authenticate } from '../middleware/auth';
 import { roleCheck } from '../middleware/roleCheck';
 import { AuthRequest, UserRole } from '../types';
 import Course from '../models/Course';
 import Enrollment from '../models/Enrollment';
+import {
+  studentCourseDetailsValidators,
+  studentEnrollValidators,
+  studentUnenrollValidators
+} from '../validators/studentValidators';
 
 const router = Router();
 
@@ -41,7 +46,7 @@ router.get('/courses', async (_req: AuthRequest, res: Response): Promise<void> =
  */
 router.get(
   '/courses/:id',
-  [param('id').isInt().withMessage('Invalid course ID')],
+  studentCourseDetailsValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -86,7 +91,7 @@ router.get(
  */
 router.post(
   '/enroll/:courseId',
-  [param('courseId').isInt().withMessage('Invalid course ID')],
+  studentEnrollValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -185,7 +190,7 @@ router.get('/my-courses', async (req: AuthRequest, res: Response): Promise<void>
  */
 router.delete(
   '/unenroll/:courseId',
-  [param('courseId').isInt().withMessage('Invalid course ID')],
+  studentUnenrollValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);

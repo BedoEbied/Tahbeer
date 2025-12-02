@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
 import { register, login, getMe, logout } from '../controllers/authController';
 import { authenticate } from '../middleware/auth';
-import { UserRole } from '../types';
+import { registerValidators, loginValidators } from '../validators/authValidators';
 
 const router = Router();
 
@@ -11,35 +10,14 @@ const router = Router();
  * @desc    Register new user
  * @access  Public
  */
-router.post(
-  '/register',
-  [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters long'),
-    body('name').notEmpty().withMessage('Name is required'),
-    body('role')
-      .optional()
-      .isIn([UserRole.STUDENT, UserRole.INSTRUCTOR, UserRole.ADMIN])
-      .withMessage('Invalid role')
-  ],
-  register
-);
+router.post('/register', registerValidators, register);
 
 /**
  * @route   POST /api/auth/login
  * @desc    Login user
  * @access  Public
  */
-router.post(
-  '/login',
-  [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('password').notEmpty().withMessage('Password is required')
-  ],
-  login
-);
+router.post('/login', loginValidators, login);
 
 /**
  * @route   GET /api/auth/me

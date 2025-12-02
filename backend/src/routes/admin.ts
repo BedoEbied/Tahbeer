@@ -1,10 +1,15 @@
 import { Router, Response } from 'express';
-import { body, param, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import { authenticate } from '../middleware/auth';
 import { roleCheck } from '../middleware/roleCheck';
 import { AuthRequest, UserRole } from '../types';
 import User from '../models/User';
 import Course from '../models/Course';
+import {
+  updateUserRoleValidators,
+  deleteUserValidators,
+  adminDeleteCourseValidators
+} from '../validators/adminValidators';
 
 const router = Router();
 
@@ -41,12 +46,7 @@ router.get('/users', async (_req: AuthRequest, res: Response): Promise<void> => 
  */
 router.put(
   '/users/:id/role',
-  [
-    param('id').isInt().withMessage('Invalid user ID'),
-    body('role')
-      .isIn([UserRole.STUDENT, UserRole.INSTRUCTOR, UserRole.ADMIN])
-      .withMessage('Invalid role')
-  ],
+  updateUserRoleValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -93,7 +93,7 @@ router.put(
  */
 router.delete(
   '/users/:id',
-  [param('id').isInt().withMessage('Invalid user ID')],
+  deleteUserValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -170,7 +170,7 @@ router.get('/courses', async (_req: AuthRequest, res: Response): Promise<void> =
  */
 router.delete(
   '/courses/:id',
-  [param('id').isInt().withMessage('Invalid course ID')],
+  adminDeleteCourseValidators,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
