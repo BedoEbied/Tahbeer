@@ -7,7 +7,7 @@ import { AuthClient } from '@/lib/auth/client';
 interface AuthContextType {
   user: UserWithoutPassword | null;
   token: string | null;
-  login: (token: string, user: UserWithoutPassword) => void;
+  login: (user: UserWithoutPassword, token?: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<{ user: UserWithoutPassword | null; token: string | null }>(() => ({
     user: AuthClient.getUser(),
-    token: AuthClient.getToken(),
+    token: null,
   }));
   const [isLoading] = useState(false);
 
@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const handleAuthChange = () => {
       setAuthState({
         user: AuthClient.getUser(),
-        token: AuthClient.getToken(),
+        token: null,
       });
     };
 
@@ -38,9 +38,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const login = (newToken: string, newUser: UserWithoutPassword) => {
-    AuthClient.login(newToken, newUser);
-    setAuthState({ token: newToken, user: newUser });
+  const login = (newUser: UserWithoutPassword, newToken?: string) => {
+    AuthClient.login(newToken ?? '', newUser);
+    setAuthState({ token: null, user: newUser });
   };
 
   const logout = () => {
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const isAuthenticated = !!authState.token && !!authState.user;
+  const isAuthenticated = !!authState.user;
 
   return (
     <AuthContext.Provider

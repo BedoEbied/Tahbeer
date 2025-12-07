@@ -15,35 +15,25 @@ export const authApi = {
    * Register a new user
    */
   register: async (data: RegisterDTO): Promise<ApiResponse<LoginResponse>> => {
-    const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/api/auth/register',
-      data
-    );
-    return response.data;
+    return apiClient.post<ApiResponse<LoginResponse>>('/api/auth/register', data);
   },
 
   /**
    * Login user
    */
   login: async (data: LoginDTO): Promise<ApiResponse<LoginResponse>> => {
-    const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/api/auth/login',
-      data
-    );
-    return response.data;
+    return apiClient.post<ApiResponse<LoginResponse>>('/api/auth/login', data);
   },
 
   /**
    * Get current user
    */
   me: async (): Promise<UserWithoutPassword> => {
-    const response = await apiClient.get<ApiResponse<UserWithoutPassword>>(
-      '/api/auth/me'
-    );
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || 'Failed to fetch user');
+    const response = await apiClient.get<ApiResponse<UserWithoutPassword>>('/api/auth/me');
+    if (!response.success || !response.data) {
+      throw new Error(response.error || 'Failed to fetch user');
     }
-    return response.data.data;
+    return response.data;
   },
 
   /**

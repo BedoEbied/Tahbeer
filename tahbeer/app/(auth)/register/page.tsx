@@ -40,7 +40,7 @@ export default function RegisterPage() {
       });
 
       if (response.success && response.data) {
-        login(response.data.token, response.data.user);
+        login(response.data.user, response.data.token);
         
         // Redirect based on role
         switch (response.data.user.role) {

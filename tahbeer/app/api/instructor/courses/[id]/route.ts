@@ -4,6 +4,7 @@ import { withAuth } from '@/lib/middleware/auth';
 import { updateCourseSchema, courseIdSchema } from '@/lib/validators/course';
 import { ApiResponse, UserRole, JwtPayload } from '@/types';
 import { ZodError } from 'zod';
+import { checkPolicy } from '@/lib/authorization/checkPolicy';
 
 /**
  * PUT /api/instructor/courses/[id] - Update own course
@@ -33,7 +34,12 @@ async function updateInstructorCourseHandler(
     }
 
     // Only course owner can update (unless admin)
-    if (course.instructor_id !== context.user.userId && context.user.role !== UserRole.ADMIN) {
+    const canUpdate = checkPolicy(
+      { id: context.user.userId, role: context.user.role },
+      'course:update',
+      course
+    );
+    if (!canUpdate) {
       return NextResponse.json<ApiResponse>(
         {
           success: false,
@@ -109,7 +115,12 @@ async function deleteInstructorCourseHandler(
     }
 
     // Only course owner can delete (unless admin)
-    if (course.instructor_id !== context.user.userId && context.user.role !== UserRole.ADMIN) {
+    const canDelete = checkPolicy(
+      { id: context.user.userId, role: context.user.role },
+      'course:delete',
+      course
+    );
+    if (!canDelete) {
       return NextResponse.json<ApiResponse>(
         {
           success: false,

@@ -1,6 +1,7 @@
 /**
  * Centralized client-side authentication utilities
- * Handles token and user management in localStorage
+ * Client-side auth convenience helpers.
+ * Token is stored in httpOnly cookies (server-issued); we only cache user info client-side.
  */
 
 import { UserWithoutPassword } from '@/types';
@@ -8,18 +9,17 @@ import { UserWithoutPassword } from '@/types';
 export const AuthClient = {
   // Token management
   getToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('token');
+    // Token is kept in httpOnly cookies; no client storage
+    return null;
   },
 
   setToken(token: string): void {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem('token', token);
+    // no-op for cookie-based auth
+    void token;
   },
 
   removeToken(): void {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem('token');
+    // no-op for cookie-based auth
   },
 
   // User management
@@ -47,23 +47,21 @@ export const AuthClient = {
 
   // Combined auth actions
   login(token: string, user: UserWithoutPassword): void {
-    this.setToken(token);
+    void token; // cookie-based auth
     this.setUser(user);
   },
 
   logout(): void {
-    this.removeToken();
     this.removeUser();
   },
 
   // Auth state check
   isAuthenticated(): boolean {
-    return !!this.getToken() && !!this.getUser();
+    return !!this.getUser();
   },
 
   // Clear all auth data
   clearAll(): void {
-    this.removeToken();
     this.removeUser();
   }
 };

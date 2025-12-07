@@ -8,12 +8,12 @@ import { JwtPayload, UserRole } from '@/types';
  */
 export async function authenticate(req: NextRequest): Promise<JwtPayload> {
   const authHeader = req.headers.get('authorization');
-
-  if (!authHeader?.startsWith('Bearer ')) {
+  const cookieToken = req.cookies.get('auth_token')?.value;
+  const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  const token = cookieToken ?? headerToken;
+  if (!token) {
     throw new Error('No token provided. Please authenticate.');
   }
-
-  const token = authHeader.substring(7);
 
   try {
     const decoded = verifyToken(token);

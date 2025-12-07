@@ -14,10 +14,7 @@ export const adminApi = {
    * Get all users
    */
   getAllUsers: async (): Promise<ApiResponse<UserWithoutPassword[]>> => {
-    const response = await apiClient.get<ApiResponse<UserWithoutPassword[]>>(
-      '/api/admin/users'
-    );
-    return response.data;
+    return apiClient.get<ApiResponse<UserWithoutPassword[]>>('/api/admin/users');
   },
 
   /**
@@ -27,30 +24,20 @@ export const adminApi = {
     userId: number,
     data: UpdateUserRoleDTO
   ): Promise<ApiResponse> => {
-    const response = await apiClient.put<ApiResponse>(
-      `/api/admin/users/${userId}/role`,
-      data
-    );
-    return response.data;
+    return apiClient.put<ApiResponse>(`/api/admin/users/${userId}/role`, data);
   },
 
   /**
    * Delete user
    */
   deleteUser: async (userId: number): Promise<ApiResponse> => {
-    const response = await apiClient.delete<ApiResponse>(
-      `/api/admin/users/${userId}`
-    );
-    return response.data;
+    return apiClient.delete<ApiResponse>(`/api/admin/users/${userId}`);
   },
 
   /**
    * Get all courses (admin view)
    */
   getAllCourses: async (): Promise<ApiResponse<ICourse[]>> => {
-    const response = await apiClient.get<ApiResponse<ICourse[]>>(
-      '/api/admin/courses'
-    );
-    return response.data;
+    return apiClient.get<ApiResponse<ICourse[]>>('/api/admin/courses');
   },
 };

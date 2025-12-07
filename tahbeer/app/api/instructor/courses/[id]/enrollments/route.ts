@@ -5,6 +5,7 @@ import { withAuth } from '@/lib/middleware/auth';
 import { courseIdSchema } from '@/lib/validators/course';
 import { ApiResponse, UserRole, EnrollmentWithDetails, JwtPayload } from '@/types';
 import { ZodError } from 'zod';
+import { checkPolicy } from '@/lib/authorization/checkPolicy';
 
 /**
  * GET /api/instructor/courses/[id]/enrollments - Get enrollments for a course
@@ -31,7 +32,12 @@ async function getCourseEnrollmentsHandler(
     }
 
     // Only course owner can view enrollments (unless admin)
-    if (course.instructor_id !== context.user.userId && context.user.role !== UserRole.ADMIN) {
+    const canView = checkPolicy(
+      { id: context.user.userId, role: context.user.role },
+      'course:update',
+      course
+    );
+    if (!canView) {
       return NextResponse.json<ApiResponse>(
         {
           success: false,
