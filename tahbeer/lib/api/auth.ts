@@ -1,0 +1,60 @@
+import apiClient from './client';
+import {
+  LoginDTO,
+  RegisterDTO,
+  LoginResponse,
+  ApiResponse,
+  UserWithoutPassword,
+} from '@/types';
+
+/**
+ * Auth API functions
+ */
+export const authApi = {
+  /**
+   * Register a new user
+   */
+  register: async (data: RegisterDTO): Promise<ApiResponse<LoginResponse>> => {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      '/api/auth/register',
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Login user
+   */
+  login: async (data: LoginDTO): Promise<ApiResponse<LoginResponse>> => {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      '/api/auth/login',
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Get current user
+   */
+  me: async (): Promise<UserWithoutPassword> => {
+    const response = await apiClient.get<ApiResponse<UserWithoutPassword>>(
+      '/api/auth/me'
+    );
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.error || 'Failed to fetch user');
+    }
+    return response.data.data;
+  },
+
+  /**
+   * Logout user (client-side)
+   */
+  logout: async () => {
+    await apiClient.post('/api/auth/logout');
+    if (globalThis.window !== undefined) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      globalThis.window.location.href = '/login';
+    }
+  },
+};
